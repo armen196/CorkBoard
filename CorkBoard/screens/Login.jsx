@@ -30,10 +30,6 @@ export default function Login({ navigation }) {
         color={color.textPrimary}
         onPress={handleLogin}/>
       </View>
-
-
-
-
     </SafeAreaView>
   );
 

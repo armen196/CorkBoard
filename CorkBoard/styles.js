@@ -1,5 +1,5 @@
-import { StyleSheet } from "react-native";
-import colors from './Colors'
+import { StyleSheet, useWindowDimensions } from "react-native";
+import colors from './Colors';
 
 export const styles = StyleSheet.create({
     loginContainer: {
@@ -9,6 +9,13 @@ export const styles = StyleSheet.create({
         alignItems: 'center',
         backgroundColor: colors.primary,
         width: '100%',
+    },
+    homeContainer: {
+        flex: 1,
+        width: '100%',
+        height: '100%',
+        backgroundColor: colors.primary,
+        justifyContent: 'center',
     },
     textField: {
         width: '90%',
@@ -29,5 +36,21 @@ export const styles = StyleSheet.create({
         textAlign: 'center',
         fontSize: 50,
         fontWeight: '600'
+    },
+    itemBox: {
+        backgroundColor: colors.white,
+        borderRadius: 15,
+        height: 100,
+        backgroundColor: colors.white,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        
+    },
+    scrollView: {
+        width: '100%',
+        
+        alignItems: 'center',
+        rowGap: 20,
+        paddingTop: 200
     }
 });
