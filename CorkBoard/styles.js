@@ -9,6 +9,7 @@ export const styles = StyleSheet.create({
         alignItems: 'center',
         backgroundColor: colors.primary,
         width: '100%',
+        padding: 20
     },
     homeContainer: {
         flex: 1,
@@ -31,6 +32,9 @@ export const styles = StyleSheet.create({
     },
     textBox: {
         paddingStart: 20
+    },
+    signUpText: {
+        
     },
     title: {
         textAlign: 'center',
