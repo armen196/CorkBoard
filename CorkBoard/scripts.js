@@ -11,9 +11,13 @@ export function registerUser(username, password) {
         username: username,
         password: password
     };
-    axios.post(url, data)
+    return axios.post(url, data)
         .then(response => {
-            console.log('User updated successfully:', response.data);
+            const data = response.data;
+            if (data.code == 503) {
+                console.log("   Username already exists");
+                return 1;
+            }
         })
         .catch(error => {
             console.error('There was a problem with the PUT request:', error);

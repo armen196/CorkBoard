@@ -20,7 +20,7 @@ export default function Login({ navigation }) {
       <Text style={styles.title}>Cork Board</Text>
       <View style={{ width: '100%', rowGap: 10, height: 'fit-content', flexDirection: 'column', justifyContent: 'flex-end' }}>
         {isLoginMessageShowing && (
-          <View style={[styles.loginMessageBar, {backgroundColor: messageBoxColor}]}>
+          <View style={[styles.loginMessageBar, { backgroundColor: messageBoxColor }]}>
             <Text>{errorMessage}</Text>
           </View>
         )}
@@ -32,12 +32,16 @@ export default function Login({ navigation }) {
             <TextInput style={styles.textBox} secureTextEntry={true} onChangeText={onChangePassword} value={password} placeholder='Password' />
           </View>
           <View style={{ width: '100%', flexDirection: 'row', justifyContent: 'space-around' }}>
-            <Text style={styles.signUpText} onPress={() => {
-              registerUser(userName, password);
+            <Text style={styles.signUpText} onPress={async () => {
+              const result = await registerUser(userName, password);
               if (userName == '' || password == '') {
                 changeMessageBoxColor(green);
                 showLoginMessage(true);
                 changeErrorMessage('Start by entering new username and password');
+              } else if (result == 1) {
+                changeMessageBoxColor(red);
+                showLoginMessage(true);
+                changeErrorMessage('Username already exists. Try again');
               }
             }}>Sign Up</Text>
             <Text>Cant Remember Password</Text>
@@ -46,23 +50,32 @@ export default function Login({ navigation }) {
             title='Submit'
             color={color.textPrimary}
             onPress={async () => {
-              const result = await signIn(userName, password);
-              console.log(result);
-              switch (result) {
-                case -1:
-                  changeMessageBoxColor(red);
-                  showLoginMessage(true);
-                  changeErrorMessage('Error connecting to server');
-                  break;
-                case 1:
-                  changeMessageBoxColor(red);
-                  showLoginMessage(true);
-                  changeErrorMessage('User does not exist');
-                  break;
-                default:
-                  console.log(" asdf");
-                  break;
+              if (userName == '' || password == '') {
+                changeMessageBoxColor(red);
+                showLoginMessage(true);
+                changeErrorMessage('Username and password required');
+              } else {
+                const result = await signIn(userName, password);
+                console.log(result);
+                switch (result) {
+                  case -1:
+                    changeMessageBoxColor(red);
+                    showLoginMessage(true);
+                    changeErrorMessage('Error connecting to server');
+                    break;
+                  case 1:
+                    changeMessageBoxColor(red);
+                    showLoginMessage(true);
+                    changeErrorMessage('User does not exist');
+                    break;
+                  case 0:
+                    navigation.navigate('Home');
+                  default:
+                    console.log(" asdf");
+                    break;
+                }
               }
+
             }} />
         </View>
       </View>

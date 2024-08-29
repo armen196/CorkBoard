@@ -65,5 +65,7 @@ export const styles = StyleSheet.create({
         alignItems: 'center',
         alignContent: 'center',
         justifyContent: 'center',
+        borderColor: 'rgba(255, 255, 255, .5)',
+        borderWidth: 2
     }
 });
