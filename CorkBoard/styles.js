@@ -9,7 +9,8 @@ export const styles = StyleSheet.create({
         alignItems: 'center',
         backgroundColor: colors.primary,
         width: '100%',
-        padding: 20
+        padding: 20,
+        height: '100%'
     },
     homeContainer: {
         flex: 1,
@@ -28,7 +29,8 @@ export const styles = StyleSheet.create({
         shadowOpacity: 0.8,
         shadowRadius: 3.84,
         elevation: 5,
-        borderRadius: 15
+        borderRadius: 15,
+        
     },
     textBox: {
         paddingStart: 20
@@ -52,9 +54,16 @@ export const styles = StyleSheet.create({
     },
     scrollView: {
         width: '100%',
-        
         alignItems: 'center',
         rowGap: 20,
         paddingTop: 200
+    },
+    loginMessageBar: {
+        width: 'fit-content',
+        height: '8%',
+        borderRadius: 100,
+        alignItems: 'center',
+        alignContent: 'center',
+        justifyContent: 'center',
     }
 });
