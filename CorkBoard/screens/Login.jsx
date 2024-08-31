@@ -6,6 +6,11 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { styles } from '../styles';
 import color from '../Colors';
 import { registerUser, signIn } from '../scripts';
+import HomeScreen from './Home';
+import { messages } from '../codes';
+
+const GREEN = true;
+const RED = false;
 
 export default function Login({ navigation }) {
   const [userName, onChangeUser] = React.useState('');
@@ -15,12 +20,28 @@ export default function Login({ navigation }) {
   const [messageBoxColor, changeMessageBoxColor] = React.useState('');
   const red = 'rgba(255, 0, 0, .3)';
   const green = 'rgba(0, 255, 0, .3)';
+
+  /**
+  * 
+  * @param {boolean} color True: Green, False: Red
+  * @param {string} message To display to users
+  * 
+  */
+  function changeMessageBar(color, message) {
+    if (color)
+      changeMessageBoxColor(green);
+    else
+      changeMessageBoxColor(red);
+    showLoginMessage(true);
+    changeErrorMessage(message);
+  }
+
   return (
     <SafeAreaView style={styles.loginContainer}>
       <Text style={styles.title}>Cork Board</Text>
       <View style={{ width: '100%', rowGap: 10, height: 'fit-content', flexDirection: 'column', justifyContent: 'flex-end' }}>
         {isLoginMessageShowing && (
-          <View style={[styles.loginMessageBar, {backgroundColor: messageBoxColor}]}>
+          <View style={[styles.loginMessageBar, { backgroundColor: messageBoxColor }]}>
             <Text>{errorMessage}</Text>
           </View>
         )}
@@ -32,16 +53,31 @@ export default function Login({ navigation }) {
             <TextInput style={styles.textBox} secureTextEntry={true} onChangeText={onChangePassword} value={password} placeholder='Password' />
           </View>
           <View style={{ width: '100%', flexDirection: 'row', justifyContent: 'space-around' }}>
-            <Text style={styles.signUpText} onPress={() => {
-              registerUser(userName, password);
+            <Text style={styles.signUpText} onPress={async () => {
               if (userName == '' || password == '') {
-                changeMessageBoxColor(green);
-                showLoginMessage(true);
-                changeErrorMessage('Start by entering new username and password');
+                changeMessageBar(GREEN, 'Start by entering new username and password');
+              } else {
+                const result = await registerUser(userName, password);
+                switch (result) {
+                  case -1:
+                    changeMessageBar(RED, messages.ERROR_SERVER_CONNECTION);
+                    break;
+                  case 0:
+                    changeMessageBar(GREEN, messages.USER_ADDED_SUCCESSFULY)
+                    break;
+                  case 1:
+                    changeMessageBar(RED, messages.ERROR_USERNAME_ALREADY_TAKEN)
+                    break;
+                  default:
+                }
               }
+
             }}>Sign Up</Text>
             <Text>Cant Remember Password</Text>
           </View>
+
+          {/* Submit Button */}
+
           <Button
             title='Submit'
             color={color.textPrimary}
@@ -50,17 +86,13 @@ export default function Login({ navigation }) {
               console.log(result);
               switch (result) {
                 case -1:
-                  changeMessageBoxColor(red);
-                  showLoginMessage(true);
-                  changeErrorMessage('Error connecting to server');
+                  changeMessageBar(RED, messages.ERROR_SERVER_CONNECTION);
                   break;
                 case 1:
-                  changeMessageBoxColor(red);
-                  showLoginMessage(true);
-                  changeErrorMessage('User does not exist');
+                  changeMessageBar(RED, messages.ERROR_USER_DONT_EXIST);
                   break;
                 default:
-                  console.log(" asdf");
+                  navigation.navigate('MainTabs');
                   break;
               }
             }} />

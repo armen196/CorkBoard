@@ -17,7 +17,7 @@ export const styles = StyleSheet.create({
         width: '100%',
         height: '100%',
         backgroundColor: colors.primary,
-        justifyContent: 'center',
+        justifyContent: 'flex-end',
     },
     textField: {
         width: '90%',
@@ -50,13 +50,13 @@ export const styles = StyleSheet.create({
         backgroundColor: colors.white,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
-        
+        justifyContent: 'space-around',
+        padding: 7,
     },
     scrollView: {
         width: '100%',
         alignItems: 'center',
         rowGap: 20,
-        paddingTop: 200
     },
     loginMessageBar: {
         width: 'fit-content',
@@ -65,5 +65,9 @@ export const styles = StyleSheet.create({
         alignItems: 'center',
         alignContent: 'center',
         justifyContent: 'center',
+
+    },
+    navBar: {
+        
     }
 });
