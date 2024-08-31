@@ -54,6 +54,7 @@ export default function Login({ navigation }) {
           </View>
           <View style={{ width: '100%', flexDirection: 'row', justifyContent: 'space-around' }}>
             <Text style={styles.signUpText} onPress={async () => {
+<<<<<<< HEAD
               if (userName == '' || password == '') {
                 changeMessageBar(GREEN, 'Start by entering new username and password');
               } else {
@@ -70,6 +71,17 @@ export default function Login({ navigation }) {
                     break;
                   default:
                 }
+=======
+              const result = await registerUser(userName, password);
+              if (userName == '' || password == '') {
+                changeMessageBoxColor(green);
+                showLoginMessage(true);
+                changeErrorMessage('Start by entering new username and password');
+              } else if (result == 1) {
+                changeMessageBoxColor(red);
+                showLoginMessage(true);
+                changeErrorMessage('Username already exists. Try again');
+>>>>>>> 0c5b179b5a1e48f7f6d0d859b1a91a62b41e6f33
               }
 
             }}>Sign Up</Text>
@@ -82,6 +94,7 @@ export default function Login({ navigation }) {
             title='Submit'
             color={color.textPrimary}
             onPress={async () => {
+<<<<<<< HEAD
               const result = await signIn(userName, password);
               console.log(result);
               switch (result) {
@@ -94,7 +107,34 @@ export default function Login({ navigation }) {
                 default:
                   navigation.navigate('MainTabs');
                   break;
+=======
+              if (userName == '' || password == '') {
+                changeMessageBoxColor(red);
+                showLoginMessage(true);
+                changeErrorMessage('Username and password required');
+              } else {
+                const result = await signIn(userName, password);
+                console.log(result);
+                switch (result) {
+                  case -1:
+                    changeMessageBoxColor(red);
+                    showLoginMessage(true);
+                    changeErrorMessage('Error connecting to server');
+                    break;
+                  case 1:
+                    changeMessageBoxColor(red);
+                    showLoginMessage(true);
+                    changeErrorMessage('User does not exist');
+                    break;
+                  case 0:
+                    navigation.navigate('Home');
+                  default:
+                    console.log(" asdf");
+                    break;
+                }
+>>>>>>> 0c5b179b5a1e48f7f6d0d859b1a91a62b41e6f33
               }
+
             }} />
         </View>
       </View>

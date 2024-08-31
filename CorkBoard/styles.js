@@ -66,8 +66,10 @@ export const styles = StyleSheet.create({
         alignContent: 'center',
         justifyContent: 'center',
 
+
     },
     navBar: {
         
+
     }
 });

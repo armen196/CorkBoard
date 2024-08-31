@@ -26,6 +26,7 @@ export function registerUser(username, password) {
             } else if (data.code == codes.USERNAME_AVAILABLE) {
                 console.log('Username available, account created');
                 return 0;
+
             }
         })
         .catch(error => {
