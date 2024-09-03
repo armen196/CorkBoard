@@ -9,16 +9,18 @@ import { codes, messages } from './codes';
  * @param {*} password 
  * @returns -1 for error, 0 for success, 1 for name taken
  */
-export function registerUser(username, password) {
-    const url = 'http://10.0.0.228:8000/CorkBoard/addUser/';
+export function registerUser(username, password, firstName, lastName, groupID) {
+    const url = 'http://10.0.0.228:8001/CorkBoard/addUser/';
     const data = {
         username: username,
-        password: password
+        password: password,
+        firstName: firstName,
+        lastName: lastName,
+        groupID: groupID
     };
 
     return axios.post(url, data)
         .then(response => {
-            console.log("wut");
             const data = response.data;
             if (data.code == codes.USERNAME_TAKEN) {
                 console.log('Username taken');
@@ -42,7 +44,7 @@ export function registerUser(username, password) {
  * @param {*} password 
  */
 export function signIn(username, password) {
-    const url = 'http://10.0.0.228:8000/CorkBoard/signIn/';
+    const url = 'http://10.0.0.228:8001/CorkBoard/signIn/';
     console.log("Atempting to sign in " + username + " with password " + password);
     const data = {
         username: username,
@@ -64,5 +66,9 @@ export function signIn(username, password) {
             console.error('There was a problem with the PUT request:', error);
             return -1;
         });
-    
+}
+
+
+export function getPosts(groupID) {
+
 }

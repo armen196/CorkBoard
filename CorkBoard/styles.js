@@ -33,7 +33,8 @@ export const styles = StyleSheet.create({
         
     },
     textBox: {
-        paddingStart: 20
+        paddingStart: 20,
+        textAlign: 'left'
     },
     signUpText: {
         

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { StatusBar, Dimensions } from 'expo-status-bar';
-import { Animated, StyleSheet, Text, View, TextInput, SafeAreaView, Button, FlatList, ScrollView, useWindowDimensions, TouchableOpacity } from 'react-native';
+import { Animated, StyleSheet, Text, View, TextInput, SafeAreaView, Button, FlatList, ScrollView, useWindowDimensions, TouchableOpacity, Touchable } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { styles } from '../styles';
@@ -42,16 +42,16 @@ export default function HomeScreen() {
         padding: 7
     };
 
-    const handlePressIn = (scaleValue, isPressed) => {
+    const handlePressIn = (scaleValue, isPressed, numberOfItems) => {
         Animated.spring(scaleValue, {
-            toValue: isPressed ? 100 : 300,
+            toValue: isPressed ? 100 : (numberOfItems * 50) + 150,
             useNativeDriver: false,
         }).start();
     };
 
     const renderPosts = ({ item }) => {
         return (
-            <View style={[styles.itemBox, {height: 50, backgroundColor: 'rgba(0, 0, 0, 0)'}]}>
+            <View style={[styles.itemBox, { height: 50, backgroundColor: 'rgba(0, 0, 0, 0)' , paddingStart: '10%'}]}>
                 <Text style={{ fontWeight: 'bold' }}>{item.username}</Text>
                 <Text>{item.reply}</Text>
             </View>
@@ -62,22 +62,30 @@ export default function HomeScreen() {
         // const [scaleValue] = useState(new Animated.Value(1));
         return (
             <Animated.View style={[itemBoxDynamic, {
-                height: item.scaleValue
+                height: item.scaleValue,
+                alignItems: 'space-around',
+
             }]}>
                 <TouchableOpacity
-                    style={{}}
+                    style={{ justifyContent: 'space-around' }}
                     onPress={() => {
-                        handlePressIn(item.scaleValue, item.isPressed);
+                        handlePressIn(item.scaleValue, item.isPressed, COMMENTS.length);
                         item.isPressed = !item.isPressed;
                         setData(newData);
                     }
-                    } >
+                    }>
                     {item.isPressed ? (
-                        <View style={{ width: '100%', height: '100%', alignItems: 'center'}}>
-                            <Text style={{ fontWeight: 'bold' }}>{item.username}</Text>
-                            <Text>{item.post}</Text>
-                            <FlatList style={{height: '70%', justifyContent: 'space-around'}} data={COMMENTS.slice(COMMENTS.length - 3)} renderItem={renderPosts} />
-                            <Text style={{fontWeight: 'bold'}}>REPLY</Text>
+                        <View style={{ width: '100%', height: '100%', justifyContent: 'space-around' }}>
+                            <View style={[styles.itemBox, { height: 100, backgroundColor: 'rgba(0, 0, 0, 0)' }]}>
+                                <Text style={{ fontWeight: 'bold' }}>{item.username}</Text>
+                                <Text>{item.post}</Text>
+                            </View>
+                            <FlatList style={{ justifyContent: 'space-around' }} data={COMMENTS} renderItem={renderPosts} />
+                            <TouchableOpacity
+                                style={{ height: 50, alignItems: 'center', justifyContent: 'center' }}
+                                onPress={console.log('asfd')}>
+                                <Text style={{ fontWeight: 'bold' }}>REPLY</Text>
+                            </TouchableOpacity>
                         </View>
                     ) : (
                         <View>

@@ -18,8 +18,13 @@ export default function Login({ navigation }) {
   const [isLoginMessageShowing, showLoginMessage] = React.useState(false);
   const [errorMessage, changeErrorMessage] = React.useState('');
   const [messageBoxColor, changeMessageBoxColor] = React.useState('');
+  const [showAccountSetUp, showSetup] = React.useState(false);
+  const [firstName, changeFirstName] = React.useState('');
+  const [lastName, changeLastName] = React.useState('');
+  const [groupID, changeGroupID] = React.useState('');
   const red = 'rgba(255, 0, 0, .3)';
   const green = 'rgba(0, 255, 0, .3)';
+  var signUpButton = 'Sign Up';
 
   /**
   * 
@@ -45,97 +50,98 @@ export default function Login({ navigation }) {
             <Text>{errorMessage}</Text>
           </View>
         )}
-        <View style={{ backgroundColor: color.white, height: '60%', width: '100%', alignItems: 'center', justifyContent: 'space-around', borderRadius: 15, minHeight: 200 }}>
+        <View style={{ paddingVertical: 20, rowGap: 20, backgroundColor: color.white, height: 'auto', width: '100%', alignItems: 'center', justifyContent: 'space-around', borderRadius: 15, minHeight: 200 }}>
           <View style={styles.textField}>
             <TextInput style={styles.textBox} onChangeText={onChangeUser} value={userName} placeholder='User Name' />
           </View>
           <View style={styles.textField}>
             <TextInput style={styles.textBox} secureTextEntry={true} onChangeText={onChangePassword} value={password} placeholder='Password' />
           </View>
-          <View style={{ width: '100%', flexDirection: 'row', justifyContent: 'space-around' }}>
-            <Text style={styles.signUpText} onPress={async () => {
-<<<<<<< HEAD
-              if (userName == '' || password == '') {
-                changeMessageBar(GREEN, 'Start by entering new username and password');
-              } else {
-                const result = await registerUser(userName, password);
-                switch (result) {
-                  case -1:
-                    changeMessageBar(RED, messages.ERROR_SERVER_CONNECTION);
-                    break;
-                  case 0:
-                    changeMessageBar(GREEN, messages.USER_ADDED_SUCCESSFULY)
-                    break;
-                  case 1:
-                    changeMessageBar(RED, messages.ERROR_USERNAME_ALREADY_TAKEN)
-                    break;
-                  default:
-                }
-=======
-              const result = await registerUser(userName, password);
-              if (userName == '' || password == '') {
-                changeMessageBoxColor(green);
-                showLoginMessage(true);
-                changeErrorMessage('Start by entering new username and password');
-              } else if (result == 1) {
-                changeMessageBoxColor(red);
-                showLoginMessage(true);
-                changeErrorMessage('Username already exists. Try again');
->>>>>>> 0c5b179b5a1e48f7f6d0d859b1a91a62b41e6f33
-              }
+          {showAccountSetUp ? (
+            <View style={{ height: 120, justifyContent: 'space-around', alignItems: 'center' }}>
+              <View style={{ width: '100%', flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center' }}>
+                <View style={{ width: '30%', alignItems: 'center' }}>
+                  <TextInput style={[styles.textBox, { width: '100%', fontSize: 10, paddingStart: 10 }]} onChangeText={changeFirstName} value={firstName} placeholder='FirstName' />
+                  <View style={{ height: 2, width: '80%', backgroundColor: 'black' }} />
+                </View>
+                <View style={{ width: '30%', alignItems: 'center' }}>
+                  <TextInput style={[styles.textBox, { width: '100%', fontSize: 10, paddingStart: 10 }]} onChangeText={changeLastName} value={lastName} placeholder='Last Name' />
+                  <View style={{ height: 2, width: '80%', backgroundColor: 'black' }} />
+                </View>
+                <View style={{ width: '30%', alignItems: 'center' }}>
+                  <TextInput style={[styles.textBox, { width: '100%', fontSize: 10, paddingStart: 10 }]} onChangeText={changeGroupID} value={groupID} placeholder='Home ID' />
+                  <View style={{ height: 2, width: '80%', backgroundColor: 'black' }} />
+                </View>
+              </View>
+              <View style={{ width: '50%' }}>
+                <Button
+                  title='submit'
+                  color={color.textPrimary}
+                  onPress={async () => {
+                    console.log("Register button clicked")
+                    if (firstName == '' || lastName == '' || groupID == '') {
+                      changeMessageBar(RED, messages.ERROR_INVALID_DATA_ENTERED);
+                    } else {
+                      const result = await registerUser(userName, password, firstName, lastName, groupID);
+                      switch (result) {
+                        case -1:
+                          changeMessageBar(RED, messages.ERROR_SERVER_CONNECTION);
+                          break;
+                        case 0:
+                          changeMessageBar(GREEN, messages.USER_ADDED_SUCCESSFULY);
+                          showSetup(false);
+                          break;
+                        case 1:
+                          changeMessageBar(RED, messages.ERROR_USERNAME_ALREADY_TAKEN);
+                          break;
+                        default:
+                      }
+                    }
+                  }
+                  } />
+              </View>
 
-            }}>Sign Up</Text>
-            <Text>Cant Remember Password</Text>
-          </View>
+            </View>
+          ) : (
+            <View style={{ rowGap: 20 }}>
+              <View style={{ width: '100%', flexDirection: 'row', justifyContent: 'space-around' }}>
 
-          {/* Submit Button */}
+                <Text style={styles.signUpText} onPress={async () => {
+                  if (userName == '' || password == '') {
+                    changeMessageBar(GREEN, 'Start by entering new username and password');
+                  } else {
+                    showSetup(true);
+                  }
 
-          <Button
-            title='Submit'
-            color={color.textPrimary}
-            onPress={async () => {
-<<<<<<< HEAD
-              const result = await signIn(userName, password);
-              console.log(result);
-              switch (result) {
-                case -1:
-                  changeMessageBar(RED, messages.ERROR_SERVER_CONNECTION);
-                  break;
-                case 1:
-                  changeMessageBar(RED, messages.ERROR_USER_DONT_EXIST);
-                  break;
-                default:
-                  navigation.navigate('MainTabs');
-                  break;
-=======
-              if (userName == '' || password == '') {
-                changeMessageBoxColor(red);
-                showLoginMessage(true);
-                changeErrorMessage('Username and password required');
-              } else {
-                const result = await signIn(userName, password);
-                console.log(result);
-                switch (result) {
-                  case -1:
-                    changeMessageBoxColor(red);
-                    showLoginMessage(true);
-                    changeErrorMessage('Error connecting to server');
-                    break;
-                  case 1:
-                    changeMessageBoxColor(red);
-                    showLoginMessage(true);
-                    changeErrorMessage('User does not exist');
-                    break;
-                  case 0:
-                    navigation.navigate('Home');
-                  default:
-                    console.log(" asdf");
-                    break;
-                }
->>>>>>> 0c5b179b5a1e48f7f6d0d859b1a91a62b41e6f33
-              }
+                }}>{signUpButton}</Text>
+                <Text>Cant Remember Password</Text>
+              </View>
 
-            }} />
+              {/* Submit Button */}
+
+              <Button
+                title='Submit'
+                color={color.textPrimary}
+                onPress={async () => {
+                  const result = await signIn(userName, password);
+                  console.log(result);
+                  switch (result) {
+                    case -1:
+                      changeMessageBar(RED, messages.ERROR_SERVER_CONNECTION);
+                      break;
+                    case 1:
+                      changeMessageBar(RED, messages.ERROR_USER_DONT_EXIST);
+                      break;
+                    default:
+                      navigation.navigate('MainTabs');
+                      break;
+                  }
+
+                }} />
+            </View>
+          )}
+
+
         </View>
       </View>
 
