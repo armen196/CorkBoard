@@ -1,16 +1,20 @@
 import React from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, TextInput, SafeAreaView, Button, TouchableOpacity, Alert } from 'react-native';
+import { StyleSheet, Text, View, TextInput, SafeAreaView, Button, TouchableOpacity, Alert, Animated } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { styles } from '../styles';
 import color from '../Colors';
-import { registerUser, signIn } from '../scripts';
+import { registerUser, signIn, getPosts } from '../scripts';
 import HomeScreen from './Home';
 import { messages } from '../codes';
+import { posts } from '../globals'; 
 
 const GREEN = true;
 const RED = false;
+// export var posts = [
+//   { username: 'Chanelle', post: 'There was a brown fox that quickly jumped over the moon', scaleValue: new Animated.Value(100), isPressed: false },
+// ];
 
 export default function Login({ navigation }) {
   const [userName, onChangeUser] = React.useState('');
@@ -133,6 +137,7 @@ export default function Login({ navigation }) {
                       changeMessageBar(RED, messages.ERROR_USER_DONT_EXIST);
                       break;
                     default:
+                      //posts = await getPosts();
                       navigation.navigate('MainTabs');
                       break;
                   }

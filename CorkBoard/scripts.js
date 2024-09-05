@@ -2,6 +2,7 @@ import axios from 'axios';
 import React from 'react';
 import { Alert } from 'react-native';
 import { codes, messages } from './codes';
+import { groupID } from './globals'
 
 /**
  * 
@@ -51,11 +52,13 @@ export function signIn(username, password) {
         password: password
     };
     return axios.post(url, data)
-        .then(response => {  
+        .then(response => {
             const data = response.data;
             console.log(data);
             if (data.code == 501) {
                 console.log(messages.SUCCESSFUL_LOGIN);
+                const asfd = data.groupID;
+                
                 return 0;
             } else if (data.code == 502) {
                 console.log(messages.ERROR_USER_DONT_EXIST);
@@ -69,6 +72,22 @@ export function signIn(username, password) {
 }
 
 
-export function getPosts(groupID) {
-
+export async function getPosts(groupID) {
+    const url = 'http://10.0.0.228:8001/CorkBoard/getPosts/';
+    const data = {
+        groupID: groupID
+    };
+    return await axios.post(url, data)
+        .then(response => {
+            console.log(response.data);
+            const toReturn = response.data;
+            if (data) {
+                console.log("Got posts successfuly");
+                console.log(toReturn);
+                return toReturn;
+            } else if (data.code == 504) {
+                console.log("Could not get posts");
+                return 1
+            }
+        })
 }
