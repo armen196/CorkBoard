@@ -122,7 +122,7 @@ export default function HomeScreen() {
                     }
                     }>
                     {showVals[ind] ? (
-                        <View style={{ width: '100%', height: '100%', justifyContent: 'space-around', alignItems: 'center' }}>
+                        <View style={{ width: '100%', justifyContent: 'space-around', alignItems: 'center' }}>
                             <View style={[styles.itemBox, { height: 100, backgroundColor: 'rgba(0, 0, 0, 0)', textAlign: 'center' }]}>
                                 <Text style={{ fontWeight: 'bold' }}>{item.poster}</Text>
                                 <Text>{item.post}</Text>
@@ -238,7 +238,7 @@ export default function HomeScreen() {
                     data={posts}
                     renderItem={renderItem}
                     refreshControl={
-                        <RefreshControl refreshing={isFetching} onRefresh={getPosts} />
+                        <RefreshControl refreshing={isFetching} onRefresh={() => fetchPosts()} />
                     } />
             </View>
 

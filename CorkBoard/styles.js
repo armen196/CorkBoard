@@ -64,6 +64,7 @@ export const styles = StyleSheet.create({
     scrollView: {
         width: '100%',
         alignItems: 'center',
+        paddingBottom: 190,
         rowGap: 20,
     },
     loginMessageBar: {

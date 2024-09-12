@@ -1,3 +1,3 @@
 import React, { useRef, useEffect, useState } from 'react';
 
-export const DEBUG = true;
+export const DEBUG = false;
