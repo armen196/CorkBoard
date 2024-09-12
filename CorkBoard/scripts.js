@@ -2,7 +2,11 @@ import axios from 'axios';
 import React from 'react';
 import { Alert } from 'react-native';
 import { codes, messages } from './codes';
-import { groupID } from './globals'
+//import { groupID, groupIDGlobal, userNameGlobal } from './globals'
+
+export var globalGroupID = '';
+export var globalUserName = '';
+export var globalFirstName = '';
 
 /**
  * 
@@ -29,7 +33,6 @@ export function registerUser(username, password, firstName, lastName, groupID) {
             } else if (data.code == codes.USERNAME_AVAILABLE) {
                 console.log('Username available, account created');
                 return 0;
-
             }
         })
         .catch(error => {
@@ -54,11 +57,11 @@ export function signIn(username, password) {
     return axios.post(url, data)
         .then(response => {
             const data = response.data;
-            console.log(data);
             if (data.code == 501) {
                 console.log(messages.SUCCESSFUL_LOGIN);
-                const asfd = data.groupID;
-                
+                globalGroupID = data.groupID;
+                globalUserName = username;
+                globalFirstName = data.firstName;
                 return 0;
             } else if (data.code == 502) {
                 console.log(messages.ERROR_USER_DONT_EXIST);
@@ -71,6 +74,9 @@ export function signIn(username, password) {
         });
 }
 
+export function print (varName="Default", toPrint) {
+    console.log(varName + ": " + toPrint);
+}
 
 export async function getPosts(groupID) {
     const url = 'http://10.0.0.228:8001/CorkBoard/getPosts/';
@@ -79,15 +85,103 @@ export async function getPosts(groupID) {
     };
     return await axios.post(url, data)
         .then(response => {
-            console.log(response.data);
             const toReturn = response.data;
-            if (data) {
-                console.log("Got posts successfuly");
-                console.log(toReturn);
+            if (toReturn) {
+                //console.log(messages.ERROR_POST_DOES_NOT_EXIST);
                 return toReturn;
             } else if (data.code == 504) {
                 console.log("Could not get posts");
                 return 1
             }
         })
+}
+
+export async function getPostReplies(postID) {
+    const url = 'http://10.0.0.228:8001/CorkBoard/getPostsReplies/';
+    const data = {
+        postID: postID
+    };
+    return await axios.post(url, data)
+        .then(response => {
+            const toReturn = response.data;
+            if (toReturn) {
+
+                return toReturn;
+            } else {
+                //console.log("Post with id \"" + postID + "\" did not have any replies...");
+                return null;
+            }
+        }
+        )
+}
+
+export async function makeReply(reply, postID) {
+    const url = 'http://10.0.0.228:8001/CorkBoard/makeReply/';
+
+    const toSend = {
+        postID: postID,
+        replier: globalUserName,
+        post: reply
+    }
+    return await axios.post(url, toSend)
+        .then(response => {
+            const data = response.data;
+        }
+        )
+}
+
+export async function makePost(post) {
+    const url = 'http://10.0.0.228:8001/CorkBoard/makePost/';
+
+    const toSend = {
+        groupID: globalGroupID,
+        poster: globalUserName,
+        post: post
+    }
+    return await axios.post(url, toSend)
+        .then(response => {
+            const data = response.data;
+        }
+        )
+}
+
+export async function makeList(listName) {
+    const url = 'http://10.0.0.228:8001/CorkBoard/makeList/';
+    const toSend = {
+        listName: listName,
+        groupID: globalGroupID
+    }
+    return await axios.post(url, toSend)
+        .then(response => {
+            const data = response.data;
+            
+        }
+        )
+}
+
+export async function getList() {
+    const url = 'http://10.0.0.228:8001/CorkBoard/getList/';
+    const toSend = {
+        groupID: globalGroupID
+    }
+    return await axios.post(url, toSend)
+        .then(response => {
+            const data = response.data;
+            return data;
+        }
+        )
+}
+
+export async function makeItem(itemName) {
+    const url = 'http://10.0.0.228:8001/CorkBoard/makeList/';
+    const toSend = {
+        listName: listName,
+        groupID: globalGroupID
+    }
+    return await axios.post(url, toSend)
+        .then(response => {
+            const data = response.data;
+            
+        }
+        )
 }

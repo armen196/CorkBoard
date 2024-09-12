@@ -5,7 +5,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Login from './screens/Login';
 import Home from './screens/Home';
-import Post from './screens/Post';
+import Lists from './screens/Lists';
 
 
 const Stack = createNativeStackNavigator();
@@ -16,7 +16,7 @@ function Tabs() {
     <Tab.Navigator>
 
       <Stack.Screen name="Home" component={Home} options={{ headerShown: false }} />
-      <Stack.Screen name="Post" component={Post} options={{ headerShown: false }} />
+      <Stack.Screen name="Lists" component={Lists} options={{ headerShown: false }} />
 
     </Tab.Navigator>
   );

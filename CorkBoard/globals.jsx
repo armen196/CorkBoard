@@ -1,4 +1,3 @@
-import React from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 
-export let groupID = '';
-export var posts = {};
+export const DEBUG = true;

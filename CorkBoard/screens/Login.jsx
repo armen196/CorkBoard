@@ -8,7 +8,7 @@ import color from '../Colors';
 import { registerUser, signIn, getPosts } from '../scripts';
 import HomeScreen from './Home';
 import { messages } from '../codes';
-import { posts } from '../globals'; 
+import { DEBUG } from '../globals'; 
 
 const GREEN = true;
 const RED = false;
@@ -16,9 +16,10 @@ const RED = false;
 //   { username: 'Chanelle', post: 'There was a brown fox that quickly jumped over the moon', scaleValue: new Animated.Value(100), isPressed: false },
 // ];
 
+
 export default function Login({ navigation }) {
-  const [userName, onChangeUser] = React.useState('');
-  const [password, onChangePassword] = React.useState('');
+  const [userName, onChangeUser] = (DEBUG) ? React.useState('123') : React.useState('');
+  const [password, onChangePassword] = (DEBUG) ? React.useState('123') : React.useState('');
   const [isLoginMessageShowing, showLoginMessage] = React.useState(false);
   const [errorMessage, changeErrorMessage] = React.useState('');
   const [messageBoxColor, changeMessageBoxColor] = React.useState('');
@@ -47,7 +48,13 @@ export default function Login({ navigation }) {
 
   return (
     <SafeAreaView style={styles.loginContainer}>
-      <Text style={styles.title}>Cork Board</Text>
+      {DEBUG ? (
+        <Text style={styles.title}>Cork Board debug</Text>
+      ) : (
+        <Text style={styles.title}>Cork Board</Text>
+      )
+    }
+      
       <View style={{ width: '100%', rowGap: 10, height: 'fit-content', flexDirection: 'column', justifyContent: 'flex-end' }}>
         {isLoginMessageShowing && (
           <View style={[styles.loginMessageBar, { backgroundColor: messageBoxColor }]}>
@@ -56,10 +63,22 @@ export default function Login({ navigation }) {
         )}
         <View style={{ paddingVertical: 20, rowGap: 20, backgroundColor: color.white, height: 'auto', width: '100%', alignItems: 'center', justifyContent: 'space-around', borderRadius: 15, minHeight: 200 }}>
           <View style={styles.textField}>
-            <TextInput style={styles.textBox} onChangeText={onChangeUser} value={userName} placeholder='User Name' />
+            <TextInput style={styles.textBox} onChangeText={onChangeUser} placeholder='User Name'
+
+            /* WARNING: Default test password. Change for production */
+
+            // value={userName} 
+            // value='123'
+            />
           </View>
           <View style={styles.textField}>
-            <TextInput style={styles.textBox} secureTextEntry={true} onChangeText={onChangePassword} value={password} placeholder='Password' />
+            <TextInput style={styles.textBox} secureTextEntry={true} onChangeText={onChangePassword} placeholder='Password'
+            
+            /* WARNING: Default test password. Change for production */
+
+            // value={password} 
+            // value='123'
+            />
           </View>
           {showAccountSetUp ? (
             <View style={{ height: 120, justifyContent: 'space-around', alignItems: 'center' }}>

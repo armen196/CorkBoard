@@ -6,4 +6,6 @@ export default {
     textSecondary: '#041F1E',
     white: '#ffffff',
     black: '#000000',
+    green: '#6cbd9a',
+    red: '#bd6c6c'
 };

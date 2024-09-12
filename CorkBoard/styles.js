@@ -17,7 +17,7 @@ export const styles = StyleSheet.create({
         width: '100%',
         height: '100%',
         backgroundColor: colors.primary,
-        justifyContent: 'flex-end',
+        justifyContent: 'flex-start',
     },
     textField: {
         width: '90%',
@@ -31,6 +31,12 @@ export const styles = StyleSheet.create({
         elevation: 5,
         borderRadius: 15,
     },
+    boxVert: {
+        alignItems: 'center',
+        justifyContent: 'space-around',
+        flexDirection: 'row',
+        width: '100%'
+    },
     textBox: {
         paddingStart: 20,
         textAlign: 'left'
@@ -41,16 +47,18 @@ export const styles = StyleSheet.create({
     title: {
         textAlign: 'center',
         fontSize: 50,
-        fontWeight: '600'
+        fontWeight: '600',
     },
     itemBox: {
         backgroundColor: colors.white,
         borderRadius: 15,
+        width: '100%',
         height: 100,
         backgroundColor: colors.white,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
         justifyContent: 'space-around',
+        alignItems: 'center',
         padding: 7,
     },
     scrollView: {
@@ -65,7 +73,7 @@ export const styles = StyleSheet.create({
         alignItems: 'center',
         alignContent: 'center',
         justifyContent: 'center',
-
+        
 
     },
     navBar: {
