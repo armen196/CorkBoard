@@ -172,16 +172,29 @@ export async function getList() {
         )
 }
 
-export async function makeItem(itemName) {
-    const url = 'http://10.0.0.228:8001/CorkBoard/makeList/';
+export async function makeItem(listID, item) {
+    const url = 'http://10.0.0.228:8001/CorkBoard/makeItem/';
     const toSend = {
-        listName: listName,
-        groupID: globalGroupID
+        listID: listID,
+        item: item
     }
     return await axios.post(url, toSend)
         .then(response => {
             const data = response.data;
-            
+            return 0;
+        }
+        )
+}
+
+export async function getItems(listID) {
+    const url = 'http://10.0.0.228:8001/CorkBoard/getItems/';
+    const toSend = {
+        listID: listID
+    }
+    return await axios.post(url, toSend)
+        .then(response => {
+            const data = response.data;
+            return data;
         }
         )
 }
