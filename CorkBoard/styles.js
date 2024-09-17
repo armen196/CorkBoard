@@ -35,7 +35,7 @@ export const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'space-around',
         flexDirection: 'row',
-        width: '100%'
+        width: '100%',
     },
     textBox: {
         paddingStart: 20,

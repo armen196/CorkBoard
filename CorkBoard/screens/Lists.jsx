@@ -4,6 +4,7 @@ import { styles } from '../styles';
 import color from '../Colors';
 import { getList, makeItem, makeList, markItemAsPurchased, print, removeItem } from '../scripts';
 import { SwipeListView } from 'react-native-swipe-list-view';
+import MasonryList from 'react-native-masonry-list';
 import Bills from './Bills';
 //let list = [];
 const listAnimValues = [];
@@ -71,7 +72,7 @@ export default function Lists({ navigation }) {
 
     const renderListItems = ({ item }) => {
         return (
-            <View style={{ width: '100%', height: 30, backgroundColor: 'white', alignItems: 'center', justifyContent: 'center' }}>
+            <View style={{ width: '100%', height: 30, backgroundColor: 'white', alignItems: 'center', justifyContent: 'center', borderBottomColor: '#bbb', borderBottomWidth: 1, marginBottom: 5}}>
                 <Text style={{ color: (item.bought ? 'green' : 'black') }}>{item.name}</Text>
             </View>
         );
@@ -89,66 +90,87 @@ export default function Lists({ navigation }) {
         fetchLists();
     }
 
-     
 
-    const renderList = async ({ item }) => {
+
+    const renderList = ({ item }) => {
+
         const ind = list.indexOf(item);
+
+        //console.log(item.items);
+        let listHeight = (item.items.length * 30);
         let val = 0;
         return (
-            <View style={{ width: '45%', height: 300, backgroundColor: 'white', borderRadius: 15, alignItems: 'center', overflow: 'hidden' }}>
-                <View style={styles.boxVert}>
-                    <Text style={{ fontWeight: 'bold' }}>
-                        {item.name}
-                    </Text>
-                    <Text style={{ fontWeight: 'bold', fontSize: 30 }}
-                        onPress={() => {
-                            changeShowItemEntry(!showItemEntry)
-                            val = listAnimValues[ind].__getValue();
-                            toggleAddItemBar(listAnimValues[ind], val);
-                        }}>+</Text>
-                </View>
-                <Animated.View style={{ width: '100%', height: listAnimValues[ind], padding: 10 }}>
-                    <TextInput onChangeText={changeItemToAdd} value={itemToAdd} style={{ width: '100%' }} placeholder={'Enter Item Here'} />
-                    <View style={{ width: '100%', height: 1, backgroundColor: 'black' }}></View>
-                    <View style={[styles.boxVert, { paddingTop: 10 }]}>
-                        <Text
-                            style={styles.buttonText}
-                            onPress={() => toggleAddItemBar(listAnimValues[ind], 1)}
-                        >CANCEL</Text>
-                        <Text
-                            style={styles.buttonText}
-                            onPress={async () => {
-                                await makeItem(item.listID, itemToAdd);
-                                toggleAddItemBar(listAnimValues[ind], 1)
-                                fetchLists();
-                            }
-                            }>SUBMIT</Text>
+            <View style={{ width: '100%', alignItems: 'center' }}>
+                <View style={{ width: '80%', height: 65 + listHeight, backgroundColor: 'white', borderRadius: 15, alignItems: 'center', overflow: 'hidden' }}>
+                    <View style={[styles.boxVert, { height: 30 }]}>
+                        <Text style={{ fontWeight: 'bold' }}>
+                            {item.name}
+                        </Text>
                     </View>
-                </Animated.View>
-                {hasData ? (
-                    <SwipeListView
-                        style={{ width: '100%' }}
-                        data={item.items}
-                        renderItem={renderListItems}
-                        renderHiddenItem={(data, rowMap) => (
-                            <View style={{ width: '100%', justifyContent: 'space-between', alignItems: 'center', flex: 1, flexDirection: 'row' }}>
-                                <TouchableOpacity style={{ width: swipeSize, height: 30, backgroundColor: 'red', alignItems: 'center', justifyContent: 'center' }} onPress={() => console.log(deleteListItem(data))} >
-                                    <Text style={{ color: 'white' }}>Delete</Text>
-                                </TouchableOpacity>
-                                <TouchableOpacity style={{ width: swipeSize, height: 30, backgroundColor: 'green', alignItems: 'center', justifyContent: 'center' }} onPress={() => console.log(markItem(data))} >
-                                    <Text style={{ color: 'white' }}>Purchased</Text>
-                                </TouchableOpacity>
+
+                    <View style={{ height: listHeight, alignItems: 'center', width: '100%' }}>
+                        <Animated.View style={{
+                            width: '100%', height: listAnimValues[ind], paddingLeft: 10, paddingRight: 10
+                        }}>
+                            <TextInput onChangeText={changeItemToAdd} value={itemToAdd} style={{ width: '100%' }} placeholder={'Enter Item Here'} />
+                            <View style={{ width: '100%', height: 1, backgroundColor: 'gray' }} />
+                            <View style={[styles.boxVert, {}]}>
+                                <Text
+                                    style={styles.buttonText}
+                                    onPress={() => toggleAddItemBar(listAnimValues[ind], 1)}
+                                >CANCEL</Text>
+                                <Text
+                                    style={styles.buttonText}
+                                    onPress={async () => {
+                                        await makeItem(item.listID, itemToAdd);
+                                        toggleAddItemBar(listAnimValues[ind], 1)
+                                        fetchLists();
+                                    }
+                                    }>SUBMIT</Text>
                             </View>
+                        </Animated.View>
+                        {hasData ? (
+                            <SwipeListView
+                                style={{ width: '100%', justifyContent: 'space-evenly', paddingTop: 10 }}
+                                data={item.items}
+                                renderItem={renderListItems}
+                                renderHiddenItem={(data, rowMap) => (
+                                    <View style={{ width: '100%', justifyContent: 'space-between', alignItems: 'center', flex: 1, flexDirection: 'row' }}>
+                                        <TouchableOpacity style={{ width: swipeSize, height: 25, backgroundColor: 'red', alignItems: 'center', justifyContent: 'center' }} onPress={() => console.log(deleteListItem(data))} >
+                                            <Text style={{ color: 'white' }}>Delete</Text>
+                                        </TouchableOpacity>
+                                        <TouchableOpacity style={{ width: swipeSize, height: 25, backgroundColor: 'green', alignItems: 'center', justifyContent: 'center' }} onPress={() => console.log(markItem(data))} >
+                                            <Text style={{ color: 'white' }}>Purchased</Text>
+                                        </TouchableOpacity>
+                                    </View>
 
+                                )}
+                                leftOpenValue={swipeSize}
+                                rightOpenValue={-swipeSize} />
+                        ) : (
+                            <></>
                         )}
-                        leftOpenValue={swipeSize}
-                        rightOpenValue={-swipeSize} />
-                ) : (
-                    <></>
-                )}
+                    </View>
 
 
+                    <View style={{ height: 35, justifyContent: 'space-between', flexDirection: 'row', width: '95%', alignItems: 'center' }}>
+                        <Text style={{ fontWeight: 'bold', fontSize: 15, paddingRight: 5 }}
+                            onPress={() => {
+                                changeShowItemEntry(!showItemEntry)
+                                val = listAnimValues[ind].__getValue();
+                                toggleAddItemBar(listAnimValues[ind], val);
+                            }}>EDIT</Text>
+                        <Text style={{ fontWeight: 'bold', fontSize: 30, paddingRight: 5 }}
+                            onPress={() => {
+                                changeShowItemEntry(!showItemEntry)
+                                val = listAnimValues[ind].__getValue();
+                                toggleAddItemBar(listAnimValues[ind], val);
+                            }}>+</Text>
+
+                    </View>
+                </View>
             </View>
+
         );
     };
 
@@ -181,32 +203,14 @@ export default function Lists({ navigation }) {
                 <FlatList
                     data={list}
                     renderItem={renderList}
-                    numColumns={2}
-                    style={{ rowGap: 20 }}
+                    contentContainerStyle={{ rowGap: 20 }}
                     refreshControl={
                         <RefreshControl refreshing={isFetching} onRefresh={() => fetchLists()} />
                     }
-                    columnWrapperStyle={{ justifyContent: 'space-around', width: '100%', padding: 10 }}></FlatList>
+                ></FlatList>
             ) : (
-                <></>
+                <Text>Loading...</Text>
             )}
-            {/* <SwipeListView
-                style={{height: '50%', backgroundColor: 'blue', width: '100%'}}
-                data={listData}
-                renderItem={(data, rowMap) => (
-                    <View style={{backgroundColor: 'orange', width: '100%', height: 50}}>
-                        <Text>hmm</Text>
-                    </View>
-                )}
-                renderHiddenItem={(data, rowMap) => (
-                    <View>
-                        <Text>asdf</Text>
-                    </View>
-                )}
-                leftOpenValue={75}
-                rightOpenValue={-75}/> */}
-
-
         </SafeAreaView>
     );
 }
