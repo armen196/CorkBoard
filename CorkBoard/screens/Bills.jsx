@@ -46,7 +46,10 @@ const Bills = () => {
                         </TouchableOpacity>
                         <TouchableOpacity
                             style={[styles.backRightBtn, styles.backRightBtnRight]}
-                            onPress={() => deleteRow(data.item.key)}
+                            onPress={() => {
+                                deleteRow(data.item.key);
+                                console.log(data);
+                            }}
                         >
                             <Text style={styles.backTextWhite}>Delete</Text>
                         </TouchableOpacity>

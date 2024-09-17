@@ -198,3 +198,31 @@ export async function getItems(listID) {
         }
         )
 }
+
+export async function removeItem(id) {
+    const url = 'http://10.0.0.228:8001/CorkBoard/removeItem/';
+    const toSend = {
+        id: id
+    }
+    
+    return await axios.post(url, toSend)
+        .then(response => {
+            const data = response.data;
+            return data;
+        }
+        )
+}
+
+export async function markItemAsPurchased(id) {
+    const url = 'http://10.0.0.228:8001/CorkBoard/markAsPurchased/';
+    const toSend = {
+        id: id
+    }
+    
+    return await axios.post(url, toSend)
+        .then(response => {
+            const data = response.data;
+            return data;
+        }
+        )
+}

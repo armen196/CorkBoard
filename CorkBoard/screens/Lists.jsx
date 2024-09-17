@@ -2,7 +2,7 @@ import React, { useRef, useEffect, useState } from 'react';
 import { Animated, Text, View, TextInput, SafeAreaView, Button, FlatList, ScrollView, useWindowDimensions, TouchableOpacity, ActivityIndicator, RefreshControl } from 'react-native';
 import { styles } from '../styles';
 import color from '../Colors';
-import { getList, makeItem, makeList, print } from '../scripts';
+import { getList, makeItem, makeList, markItemAsPurchased, print, removeItem } from '../scripts';
 import { SwipeListView } from 'react-native-swipe-list-view';
 import Bills from './Bills';
 //let list = [];
@@ -16,8 +16,11 @@ export default function Lists({ navigation }) {
     const [list, changeList] = useState([]);
     const [itemToAdd, changeItemToAdd] = useState('');
     const [showItemEntry, changeShowItemEntry] = useState(false);
+    const [isFetching, changeIsFetching] = useState(false);
     const addListHeight = useRef(new Animated.Value(0)).current;
     const addItemHeight = useRef(new Animated.Value(0)).current;
+    const swipeSize = 70;
+
     const [listData, setListData] = useState(
         Array(5)
             .fill('')
@@ -45,22 +48,21 @@ export default function Lists({ navigation }) {
     };
 
     const fetchLists = async () => {
+        changeIsFetching(true);
         const rawList = await getList();
         if (rawList && rawList.lists) {
             changeList(rawList.lists);
-
             rawList.lists.forEach(el => {
                 itemList.push(el.items);
                 listAnimValues.push(new Animated.Value(0));
             });
-            //console.log(itemList);
+            changeIsFetching(false)
             changeHasData(true);
         }
     };
 
     useEffect(() => {
         fetchLists();
-
     }, []);
 
     const handleAddItem = () => {
@@ -69,20 +71,35 @@ export default function Lists({ navigation }) {
 
     const renderListItems = ({ item }) => {
         return (
-            <View style={{ width: '100%', height: 30, backgroundColor: 'gray', alignItems: 'center' }}>
-                <Text>{item.name}</Text>
+            <View style={{ width: '100%', height: 30, backgroundColor: 'white', alignItems: 'center', justifyContent: 'center' }}>
+                <Text style={{ color: (item.bought ? 'green' : 'black') }}>{item.name}</Text>
             </View>
         );
     }
 
+    const deleteListItem = async ({ item }) => {
+        console.log("To delete: " + JSON.stringify(item));
+        await removeItem(item.id);
+        fetchLists();
+    }
+
+    const markItem = async ({ item }) => {
+        console.log("To mark: " + JSON.stringify(item));
+        await markItemAsPurchased(item.id);
+        fetchLists();
+    }
+
+     
+
     const renderList = async ({ item }) => {
         const ind = list.indexOf(item);
         let val = 0;
-        //console.log(list[ind].items);
         return (
-            <View style={{ width: '45%', height: 300, backgroundColor: 'white', borderRadius: 15, alignItems: 'center', padding: 10, overflow: 'hidden' }}>
+            <View style={{ width: '45%', height: 300, backgroundColor: 'white', borderRadius: 15, alignItems: 'center', overflow: 'hidden' }}>
                 <View style={styles.boxVert}>
-                    <Text style={{ fontWeight: 'bold' }}>{item.name}</Text>
+                    <Text style={{ fontWeight: 'bold' }}>
+                        {item.name}
+                    </Text>
                     <Text style={{ fontWeight: 'bold', fontSize: 30 }}
                         onPress={() => {
                             changeShowItemEntry(!showItemEntry)
@@ -90,14 +107,16 @@ export default function Lists({ navigation }) {
                             toggleAddItemBar(listAnimValues[ind], val);
                         }}>+</Text>
                 </View>
-                <Animated.View style={{ width: '100%', height: listAnimValues[ind] }}>
+                <Animated.View style={{ width: '100%', height: listAnimValues[ind], padding: 10 }}>
                     <TextInput onChangeText={changeItemToAdd} value={itemToAdd} style={{ width: '100%' }} placeholder={'Enter Item Here'} />
                     <View style={{ width: '100%', height: 1, backgroundColor: 'black' }}></View>
                     <View style={[styles.boxVert, { paddingTop: 10 }]}>
                         <Text
+                            style={styles.buttonText}
                             onPress={() => toggleAddItemBar(listAnimValues[ind], 1)}
                         >CANCEL</Text>
                         <Text
+                            style={styles.buttonText}
                             onPress={async () => {
                                 await makeItem(item.listID, itemToAdd);
                                 toggleAddItemBar(listAnimValues[ind], 1)
@@ -106,19 +125,24 @@ export default function Lists({ navigation }) {
                             }>SUBMIT</Text>
                     </View>
                 </Animated.View>
-
                 {hasData ? (
                     <SwipeListView
-                        style={{ width: '100%', padding: 10 }}
+                        style={{ width: '100%' }}
                         data={item.items}
                         renderItem={renderListItems}
                         renderHiddenItem={(data, rowMap) => (
-                            <View style={{ backgroundColor: 'red', justifyContent: 'center', alignItems: 'center', flex: 1 }}>
-                                <Text>Delete</Text>
+                            <View style={{ width: '100%', justifyContent: 'space-between', alignItems: 'center', flex: 1, flexDirection: 'row' }}>
+                                <TouchableOpacity style={{ width: swipeSize, height: 30, backgroundColor: 'red', alignItems: 'center', justifyContent: 'center' }} onPress={() => console.log(deleteListItem(data))} >
+                                    <Text style={{ color: 'white' }}>Delete</Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity style={{ width: swipeSize, height: 30, backgroundColor: 'green', alignItems: 'center', justifyContent: 'center' }} onPress={() => console.log(markItem(data))} >
+                                    <Text style={{ color: 'white' }}>Purchased</Text>
+                                </TouchableOpacity>
                             </View>
+
                         )}
-                        leftOpenValue={75}
-                        rightOpenValue={-75} />
+                        leftOpenValue={swipeSize}
+                        rightOpenValue={-swipeSize} />
                 ) : (
                     <></>
                 )}
@@ -159,6 +183,9 @@ export default function Lists({ navigation }) {
                     renderItem={renderList}
                     numColumns={2}
                     style={{ rowGap: 20 }}
+                    refreshControl={
+                        <RefreshControl refreshing={isFetching} onRefresh={() => fetchLists()} />
+                    }
                     columnWrapperStyle={{ justifyContent: 'space-around', width: '100%', padding: 10 }}></FlatList>
             ) : (
                 <></>
