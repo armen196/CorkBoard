@@ -226,3 +226,32 @@ export async function markItemAsPurchased(id) {
         }
         )
 }
+
+export async function changeListName(listName, existingListName) {
+    const url = 'http://10.0.0.228:8001/CorkBoard/changeName/';
+    const toSend = {
+        toChange: existingListName,
+        listName: listName
+    }
+    
+    return await axios.post(url, toSend)
+        .then(response => {
+            const data = response.data;
+            return data;
+        }
+        )
+}
+
+export async function deleteList(listName) {
+    const url = 'http://10.0.0.228:8001/CorkBoard/deleteList/';
+    const toSend = {
+        listName: listName
+    }
+    
+    return await axios.post(url, toSend)
+        .then(response => {
+            const data = response.data;
+            return data;
+        }
+        )
+}
