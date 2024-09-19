@@ -1,14 +1,14 @@
 import React from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, TextInput, SafeAreaView, Button, TouchableOpacity, Alert, Animated } from 'react-native';
+import { StyleSheet, Text, View, TextInput, SafeAreaView, Button, TouchableOpacity, Alert, Animated, AppRegistry } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { styles } from '../styles';
 import color from '../Colors';
-import { registerUser, signIn, getPosts } from '../scripts';
+import { registerUser, signIn, getPosts, getGroupMembers } from '../scripts';
 import HomeScreen from './Home';
 import { messages } from '../codes';
-import { DEBUG } from '../globals'; 
+import { DEBUG } from '../globals';
 
 const GREEN = true;
 const RED = false;
@@ -46,6 +46,50 @@ export default function Login({ navigation }) {
     changeErrorMessage(message);
   }
 
+  const showGroupAlert = (groupID, groupMembers) => {
+    let memberList = "Are you sure you want to join this group? \n\nMembers: ";
+    let len = groupMembers.length;
+    let x = 1;
+    console.log(len);
+
+    groupMembers.forEach(element => {
+      memberList += element.firstName;
+      if (x < len) memberList += ', '
+      
+      x += 1;
+    });
+    Alert.alert(
+      "Joining group " + groupID,
+      memberList,
+      [
+        {
+          text: 'CANCEL',
+          onPress: () => { return false },
+        },
+        {
+          text: 'OK',
+          onPress: async () => {
+            const result = await registerUser(userName, password, firstName, lastName, groupID);
+            switch (result) {
+              case -1:
+                changeMessageBar(RED, messages.ERROR_SERVER_CONNECTION);
+                break;
+              case 0:
+                let groupMembers = await getGroupMembers(groupID);
+                changeMessageBar(GREEN, messages.USER_ADDED_SUCCESSFULY);
+                showSetup(false);
+                break;
+              case 1:
+                changeMessageBar(RED, messages.ERROR_USERNAME_ALREADY_TAKEN);
+                break;
+              default:
+            }
+          }
+        }
+      ]
+    );
+  }
+
   return (
     <SafeAreaView style={styles.loginContainer}>
       {DEBUG ? (
@@ -53,8 +97,8 @@ export default function Login({ navigation }) {
       ) : (
         <Text style={styles.title}>Cork Board</Text>
       )
-    }
-      
+      }
+
       <View style={{ width: '100%', rowGap: 10, height: 'fit-content', flexDirection: 'column', justifyContent: 'flex-end' }}>
         {isLoginMessageShowing && (
           <View style={[styles.loginMessageBar, { backgroundColor: messageBoxColor }]}>
@@ -63,37 +107,22 @@ export default function Login({ navigation }) {
         )}
         <View style={{ paddingVertical: 20, rowGap: 20, backgroundColor: color.white, height: 'auto', width: '100%', alignItems: 'center', justifyContent: 'space-around', borderRadius: 15, minHeight: 200 }}>
           <View style={styles.textField}>
-            <TextInput style={styles.textBox} onChangeText={onChangeUser} placeholder='User Name'
-
-            /* WARNING: Default test password. Change for production */
-
-            // value={userName} 
-            // value='123'
-            />
+            <TextInput style={styles.textBox} onChangeText={onChangeUser} placeholder='User Name' />
           </View>
           <View style={styles.textField}>
-            <TextInput style={styles.textBox} secureTextEntry={true} onChangeText={onChangePassword} placeholder='Password'
-            
-            /* WARNING: Default test password. Change for production */
-
-            // value={password} 
-            // value='123'
-            />
+            <TextInput style={styles.textBox} secureTextEntry={true} onChangeText={onChangePassword} placeholder='Password' />
           </View>
           {showAccountSetUp ? (
-            <View style={{ height: 120, justifyContent: 'space-around', alignItems: 'center' }}>
+            <View style={{ height: 120, justifyContent: 'space-around', alignItems: 'center', width: '100%' }}>
               <View style={{ width: '100%', flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center' }}>
                 <View style={{ width: '30%', alignItems: 'center' }}>
-                  <TextInput style={[styles.textBox, { width: '100%', fontSize: 10, paddingStart: 10 }]} onChangeText={changeFirstName} value={firstName} placeholder='FirstName' />
-                  <View style={{ height: 2, width: '80%', backgroundColor: 'black' }} />
+                  <TextInput style={[styles.textBox, { width: '100%', fontSize: 10, paddingStart: 10, borderBottomWidth: 1, borderColor: 'gray' }]} onChangeText={changeFirstName} value={firstName} placeholder='FirstName' />
                 </View>
                 <View style={{ width: '30%', alignItems: 'center' }}>
-                  <TextInput style={[styles.textBox, { width: '100%', fontSize: 10, paddingStart: 10 }]} onChangeText={changeLastName} value={lastName} placeholder='Last Name' />
-                  <View style={{ height: 2, width: '80%', backgroundColor: 'black' }} />
+                  <TextInput style={[styles.textBox, { width: '100%', fontSize: 10, paddingStart: 10, borderBottomWidth: 1, borderColor: 'gray' }]} onChangeText={changeLastName} value={lastName} placeholder='Last Name' />
                 </View>
                 <View style={{ width: '30%', alignItems: 'center' }}>
-                  <TextInput style={[styles.textBox, { width: '100%', fontSize: 10, paddingStart: 10 }]} onChangeText={changeGroupID} value={groupID} placeholder='Home ID' />
-                  <View style={{ height: 2, width: '80%', backgroundColor: 'black' }} />
+                  <TextInput style={[styles.textBox, { width: '100%', fontSize: 10, paddingStart: 10, borderBottomWidth: 1, borderColor: 'gray' }]} onChangeText={changeGroupID} value={groupID} placeholder='Home ID' />
                 </View>
               </View>
               <View style={{ width: '50%' }}>
@@ -101,24 +130,11 @@ export default function Login({ navigation }) {
                   title='submit'
                   color={color.textPrimary}
                   onPress={async () => {
-                    console.log("Register button clicked")
                     if (firstName == '' || lastName == '' || groupID == '') {
                       changeMessageBar(RED, messages.ERROR_INVALID_DATA_ENTERED);
                     } else {
-                      const result = await registerUser(userName, password, firstName, lastName, groupID);
-                      switch (result) {
-                        case -1:
-                          changeMessageBar(RED, messages.ERROR_SERVER_CONNECTION);
-                          break;
-                        case 0:
-                          changeMessageBar(GREEN, messages.USER_ADDED_SUCCESSFULY);
-                          showSetup(false);
-                          break;
-                        case 1:
-                          changeMessageBar(RED, messages.ERROR_USERNAME_ALREADY_TAKEN);
-                          break;
-                        default:
-                      }
+                      const groupMembers = await getGroupMembers(groupID)
+                      showGroupAlert(groupID, groupMembers);
                     }
                   }
                   } />
@@ -156,7 +172,6 @@ export default function Login({ navigation }) {
                       changeMessageBar(RED, messages.ERROR_USER_DONT_EXIST);
                       break;
                     default:
-                      //posts = await getPosts();
                       navigation.navigate('MainTabs');
                       break;
                   }

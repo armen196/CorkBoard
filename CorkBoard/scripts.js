@@ -255,3 +255,19 @@ export async function deleteList(listName) {
         }
         )
 }
+
+export async function getGroupMembers(groupID) {
+    const url = 'http://10.0.0.228:8001/CorkBoard/getGroupMembers/';
+    const toSend = {
+        groupID: groupID
+    }
+    
+    return await axios.post(url, toSend)
+        .then(response => {
+            
+            const data = response.data;
+            
+            return data;
+        }
+        )
+}
