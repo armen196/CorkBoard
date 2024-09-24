@@ -1,8 +1,8 @@
 import React, { useRef, useEffect, useState } from 'react';
-import { Animated, Text, View, TextInput, SafeAreaView, Button, FlatList, ScrollView, useWindowDimensions, TouchableOpacity, ActivityIndicator, RefreshControl } from 'react-native';
+import { Animated, Text, View, TextInput, SafeAreaView, Button, FlatList, ScrollView, useWindowDimensions, TouchableOpacity, ActivityIndicator, RefreshControl, Image } from 'react-native';
 import { styles } from '../styles';
 import color from '../Colors';
-import { getPostReplies, getPosts, makePost, globalGroupID, makeReply, globalFirstName } from '../scripts';
+import { getPostReplies, getPosts, makePost, globalGroupID, makeReply, globalFirstName, getImageTag, updateUsers } from '../scripts';
 
 let posts = [];
 let comments = [];
@@ -22,6 +22,7 @@ export default function HomeScreen() {
     const [isFetching, changeIsFetching] = useState(false);
     const fetchPosts = async () => {
         changeIsFetching(true);
+        updateUsers(globalGroupID);
         try {
             posts = [];
             const result = await getPosts(globalGroupID);
@@ -38,6 +39,7 @@ export default function HomeScreen() {
 
     useEffect(() => {
         fetchPosts();
+
         changeHasData(true);
     }, []);
 
@@ -46,7 +48,6 @@ export default function HomeScreen() {
             <View style={{ alignItems: 'center', width: '100%', height: '100%' }}>
                 <ActivityIndicator size="large" color={color.black} />
             </View>
-
         );
     }
 
@@ -60,7 +61,6 @@ export default function HomeScreen() {
         shadowOffset: { width: 0, height: 2 },
         justifyContent: 'space-around',
         alignItems: 'center',
-        padding: 7
     };
 
     const REPLY_BOX_SIZE = 75;
@@ -72,13 +72,41 @@ export default function HomeScreen() {
         }).start();
     };
 
-    const renderPosts = ({ item }) => {
-        return (
-            <View style={[styles.itemBox, { height: REPLY_BOX_SIZE, backgroundColor: 'rgba(0, 0, 0, 0)' }]}>
-                <Text style={{ fontWeight: 'bold' }}>{item.poster}</Text>
-                <Text>{item.post}</Text>
-            </View>
-        );
+    const renderPosts = ({ item, index }) => {
+        if (item.poster == "No replies yet!") {
+            return (
+                <View style={[styles.boxVert, { height: REPLY_BOX_SIZE, borderColor: '#bbb', borderBottomWidth: 1, borderTopWidth: index === 0 ? 1 : 0 }]}>
+                    <View style={{ width: '60%', alignItems: 'center' }}>
+                        <Text style={{ fontWeight: 'bold' }}>{item.poster}</Text>
+                        <Text>{item.post}</Text>
+                    </View>
+
+                </View>
+            );
+        }
+
+        if (index % 2) {
+            return (
+                <View style={[styles.boxVert, { height: REPLY_BOX_SIZE, borderColor: '#bbb', borderBottomWidth: 1, borderTopWidth: index === 0 ? 1 : 0 }]}>
+                    <Image source={{ uri: 'http://10.0.0.228:8001/media/images/' + item.poster + '.jpg' }} style={{ width: '15%', aspectRatio: 1, backgroundColor: 'black', borderRadius: 100 }} />
+                    <View style={{ width: '60%' }}>
+                        <Text style={{ fontWeight: 'bold' }}>{item.poster}</Text>
+                        <Text>{item.post}</Text>
+                    </View>
+
+                </View>
+            );
+        } else {
+            return (
+                <View style={[styles.boxVert, { height: REPLY_BOX_SIZE, borderColor: '#bbb', borderBottomWidth: 1, borderTopWidth: index === 0 ? 1 : 0 }]}>
+                    <View style={{ width: '60%' }}>
+                        <Text style={{ fontWeight: 'bold', textAlign: 'right' }}>{item.poster}</Text>
+                        <Text style={{ textAlign: 'right' }}>{item.post}</Text>
+                    </View>
+                    <Image source={{ uri: 'http://10.0.0.228:8001/media/images/' + item.poster + '.jpg' }} style={{ width: '15%', aspectRatio: 1, backgroundColor: 'black', borderRadius: 100 }} />
+                </View>
+            );
+        }
     };
 
     const updateReplies = (async (ind, postID, update) => {
@@ -89,7 +117,7 @@ export default function HomeScreen() {
                 comments.push(post);
             })
         } else {
-            
+
         }
         if (!update) {
             let x = showVals.length;
@@ -105,16 +133,22 @@ export default function HomeScreen() {
         setData(newData);
     });
 
-
+    // <Image source={{uri: image}} style={{height: '100%', width: '100%'}}/>
 
     const renderItem = ({ item }) => {
         const ind = posts.indexOf(item);
+        //getImageTag(item.poster)
+
+
 
         var replyHeight = 50;
         return (
             <Animated.View style={[itemBoxDynamic, {
-                height: animVals[ind],
+                height: animVals[ind], flexDirection: 'row'
             }]}>
+                {/* <View style={{width: '20%', height: '20%', backgroundColor: 'black'}}>
+
+                </View> */}
                 <TouchableOpacity
                     style={{ justifyContent: 'space-around', width: '100%', alignItems: 'center' }}
                     onPress={async () => {
@@ -123,16 +157,19 @@ export default function HomeScreen() {
                     }>
                     {showVals[ind] ? (
                         <View style={{ width: '100%', justifyContent: 'space-around', alignItems: 'center' }}>
-                            <View style={[styles.itemBox, { height: 100, backgroundColor: 'rgba(0, 0, 0, 0)', textAlign: 'center' }]}>
-                                <Text style={{ fontWeight: 'bold' }}>{item.poster}</Text>
-                                <Text>{item.post}</Text>
+                            <View style={[styles.itemBox, { height: 100, textAlign: 'center' }]}>
+                                <View style={styles.boxVert}>
+                                    <Image source={{ uri: 'http://10.0.0.228:8001/media/images/' + item.poster + '.jpg' }} style={{ width: '20%', aspectRatio: 1, backgroundColor: 'black', borderRadius: 100 }} />
+                                    <View style={{ width: '60%' }}>
+                                        <Text style={{ fontWeight: 'bold' }}>{item.poster}</Text>
+                                        <Text>{item.post}</Text>
+                                    </View>
+                                </View>
+
                             </View>
-                            <FlatList style={{ width: '100%', justifyContent: 'space-around', alignItems: 'center' }} data={comments} renderItem={renderPosts} />
+                            <FlatList style={{ width: '100%' }} data={comments} renderItem={renderPosts} />
 
-                            <View
-                                style={{ height: replyHeight, alignItems: 'center', justifyContent: 'center', width: '100%' }}
-                                onPress={console.log('asdfasdfasdf')}>
-
+                            <View style={{ height: replyHeight, alignItems: 'center', justifyContent: 'center', width: '100%' }}>
                                 <TextInput onPress={() => changeShowReply(true)} style={{}} placeholder='REPLY' onChangeText={changeToReply} value={toReply} />
                                 {showReply ? (
                                     <View style={{ width: '100%', flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center' }}>
@@ -156,10 +193,13 @@ export default function HomeScreen() {
 
                         </View>
                     ) : (
-                        <View style={{ width: '100%', height: '100%', justifyContent: 'space-around', alignItems: 'center' }}>
-                            <View style={[styles.itemBox, { height: 100, backgroundColor: 'rgba(0, 0, 0, 0)', textAlign: 'center' }]}>
-                                <Text style={{ fontWeight: 'bold' }}>{item.poster}</Text>
-                                <Text>{item.post}</Text>
+                        <View style={[styles.itemBox, { height: 100, textAlign: 'center' }]}>
+                            <View style={styles.boxVert}>
+                                <Image source={{ uri: 'http://10.0.0.228:8001/media/images/' + item.poster + '.jpg' }} style={{ width: '20%', aspectRatio: 1, backgroundColor: 'black', borderRadius: 100 }} />
+                                <View style={{ width: '60%', alignItems: 'center' }}>
+                                    <Text style={{ fontWeight: 'bold' }}>{item.poster}</Text>
+                                    <Text>{item.post}</Text>
+                                </View>
                             </View>
 
                         </View>
@@ -199,7 +239,7 @@ export default function HomeScreen() {
                         </TouchableOpacity>
                     </Animated.View>
                 </View>
-                <Animated.View style={{ width: '100%', height: animHeight, alignItems: 'center', justifyContent: 'space-around', overflow: 'hidden'}}>
+                <Animated.View style={{ width: '100%', height: animHeight, alignItems: 'center', justifyContent: 'space-around', overflow: 'hidden' }}>
                     <TextInput style={{ backgroundColor: color.secondary, width: 300, height: '40%', paddingStart: 15, borderRadius: 15 }} onChangeText={changeToPost} value={toPost} placeholder='Enter post here' />
                     <View style={{ width: '100%', flexDirection: 'row', justifyContent: 'space-evenly' }}>
                         <Button
@@ -221,14 +261,6 @@ export default function HomeScreen() {
 
                 </Animated.View>
             </View>
-
-
-            {/* {postBar ? (
-                <Animated.View style={{ width: '100%', height: '20%', alignItems: 'center', backgroundColor: 'black' }}>
-                    <TextInput style={{ backgroundColor: color.secondary, width: 100 }}></TextInput>
-                </Animated.View>
-            ) : ( <></> )} */}
-
 
 
 

@@ -2,43 +2,51 @@ import axios from 'axios';
 import React from 'react';
 import { Alert } from 'react-native';
 import { codes, messages } from './codes';
+import {  } from './globals';
 //import { groupID, groupIDGlobal, userNameGlobal } from './globals'
 
 export var globalGroupID = '';
 export var globalUserName = '';
 export var globalFirstName = '';
+export var groupMembers = [];
 
-/**
- * 
- * @param {*} username 
- * @param {*} password 
- * @returns -1 for error, 0 for success, 1 for name taken
- */
-export function registerUser(username, password, firstName, lastName, groupID) {
+export async function registerUser(userName, password, firstName, lastName, groupID, imageUri) {
     const url = 'http://10.0.0.228:8001/CorkBoard/addUser/';
-    const data = {
-        username: username,
-        password: password,
-        firstName: firstName,
-        lastName: lastName,
-        groupID: groupID
-    };
+    // Create FormData and append all fields, including the image
+    let formData = new FormData();
+    formData.append('username', userName);
+    formData.append('password', password);
+    formData.append('firstName', firstName);
+    formData.append('lastName', lastName);
+    formData.append('groupID', groupID);
+    formData.append('image', {
+        uri: imageUri,       // URI to the image
+        name: userName + '.jpg',   // Name of the file
+        type: 'image/jpeg'   // MIME type
+    });
 
-    return axios.post(url, data)
-        .then(response => {
-            const data = response.data;
-            if (data.code == codes.USERNAME_TAKEN) {
-                console.log('Username taken');
-                return 1;
-            } else if (data.code == codes.USERNAME_AVAILABLE) {
-                console.log('Username available, account created');
-                return 0;
-            }
-        })
-        .catch(error => {
-            console.error('There was a problem with the PUT request:', error);
-            return -1;
+    try {
+        // Send formData directly
+        const response = await axios.post(url, formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data',  // Important to set this header for FormData
+            },
         });
+        
+        const data = response.data;
+        if (data.code === 511) {
+            console.log('Username taken');
+            return 1;
+        } else if (data.code === 510) {
+            console.log('Username available, account created');
+            return 0;
+        } else {
+            return 'hmm';
+        }
+    } catch (error) {
+        console.error('There was a problem with the POST request:', error);
+        return -1;
+    }
 }
 
 /**
@@ -62,6 +70,7 @@ export function signIn(username, password) {
                 globalGroupID = data.groupID;
                 globalUserName = username;
                 globalFirstName = data.firstName;
+                updateUsers(globalGroupID);
                 return 0;
             } else if (data.code == 502) {
                 console.log(messages.ERROR_USER_DONT_EXIST);
@@ -74,7 +83,7 @@ export function signIn(username, password) {
         });
 }
 
-export function print (varName="Default", toPrint) {
+export function print(varName = "Default", toPrint) {
     console.log(varName + ": " + toPrint);
 }
 
@@ -154,7 +163,7 @@ export async function makeList(listName) {
     return await axios.post(url, toSend)
         .then(response => {
             const data = response.data;
-            
+
         }
         )
 }
@@ -204,7 +213,7 @@ export async function removeItem(id) {
     const toSend = {
         id: id
     }
-    
+
     return await axios.post(url, toSend)
         .then(response => {
             const data = response.data;
@@ -218,7 +227,7 @@ export async function markItemAsPurchased(id) {
     const toSend = {
         id: id
     }
-    
+
     return await axios.post(url, toSend)
         .then(response => {
             const data = response.data;
@@ -233,7 +242,7 @@ export async function changeListName(listName, existingListName) {
         toChange: existingListName,
         listName: listName
     }
-    
+
     return await axios.post(url, toSend)
         .then(response => {
             const data = response.data;
@@ -247,7 +256,7 @@ export async function deleteList(listName) {
     const toSend = {
         listName: listName
     }
-    
+
     return await axios.post(url, toSend)
         .then(response => {
             const data = response.data;
@@ -261,13 +270,45 @@ export async function getGroupMembers(groupID) {
     const toSend = {
         groupID: groupID
     }
-    
+
     return await axios.post(url, toSend)
         .then(response => {
-            
+
             const data = response.data;
-            
+
             return data;
         }
         )
+
+}
+
+export async function updateUsers(groupID) {
+    const url = 'http://10.0.0.228:8001/CorkBoard/getUsers/';
+    const toSend = {
+        groupID: groupID
+    }
+
+    return await axios.post(url, toSend)
+        .then(response => {
+            const data = response.data;
+            if (data == 521) {
+                return 1;
+            } else {
+                groupMembers = data;
+                return data;
+            }
+            
+        }
+        )
+}
+
+export function getImageTag(userName) {
+    groupMembers.forEach(element => {
+        console.log("Checking " + JSON.stringify(element) + " against " + userName);
+        if (element.username == userName) {
+            console.log("returning: " + 'http://10.0.0.228:8001/media/' + element.image);
+            return 'http://10.0.0.228:8001/media/' + element.image;
+        }
+        console.log("Got no image tag");
+    });
 }

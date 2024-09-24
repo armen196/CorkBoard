@@ -33,7 +33,7 @@ export const styles = StyleSheet.create({
     },
     boxVert: {
         alignItems: 'center',
-        justifyContent: 'space-around',
+        justifyContent: 'space-evenly',
         flexDirection: 'row',
         width: '100%',
     },
@@ -59,7 +59,6 @@ export const styles = StyleSheet.create({
         shadowOffset: { width: 0, height: 2 },
         justifyContent: 'space-around',
         alignItems: 'center',
-        padding: 7,
     },
     scrollView: {
         width: '100%',

@@ -1,14 +1,17 @@
 import React from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, TextInput, SafeAreaView, Button, TouchableOpacity, Alert, Animated, AppRegistry } from 'react-native';
+import { StyleSheet, Text, View, TextInput, SafeAreaView, Button, TouchableOpacity, Alert, Animated, AppRegistry, Image } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { styles } from '../styles';
+import { launchImageLibrary } from 'react-native-image-picker';
+import * as ImagePicker from 'expo-image-picker';
 import color from '../Colors';
-import { registerUser, signIn, getPosts, getGroupMembers } from '../scripts';
+import { registerUser, signIn, getPosts, getGroupMembers, updateUsers } from '../scripts';
 import HomeScreen from './Home';
 import { messages } from '../codes';
 import { DEBUG } from '../globals';
+import Colors from '../Colors';
 
 const GREEN = true;
 const RED = false;
@@ -27,6 +30,8 @@ export default function Login({ navigation }) {
   const [firstName, changeFirstName] = React.useState('');
   const [lastName, changeLastName] = React.useState('');
   const [groupID, changeGroupID] = React.useState('');
+  const [imageUri, setImageUri] = React.useState(null);
+  const [image, setImage] = React.useState('');
   const red = 'rgba(255, 0, 0, .3)';
   const green = 'rgba(0, 255, 0, .3)';
   var signUpButton = 'Sign Up';
@@ -46,16 +51,27 @@ export default function Login({ navigation }) {
     changeErrorMessage(message);
   }
 
+  const selectImage = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 1,
+    });
+
+    setImage(result.assets[0].uri)
+
+  }
+
   const showGroupAlert = (groupID, groupMembers) => {
     let memberList = "Are you sure you want to join this group? \n\nMembers: ";
     let len = groupMembers.length;
     let x = 1;
-    console.log(len);
 
     groupMembers.forEach(element => {
       memberList += element.firstName;
       if (x < len) memberList += ', '
-      
+
       x += 1;
     });
     Alert.alert(
@@ -69,13 +85,15 @@ export default function Login({ navigation }) {
         {
           text: 'OK',
           onPress: async () => {
-            const result = await registerUser(userName, password, firstName, lastName, groupID);
+            
+            const result = await registerUser(userName, password, firstName, lastName, groupID, image);
+            console.log(result);
             switch (result) {
               case -1:
                 changeMessageBar(RED, messages.ERROR_SERVER_CONNECTION);
                 break;
               case 0:
-                let groupMembers = await getGroupMembers(groupID);
+                
                 changeMessageBar(GREEN, messages.USER_ADDED_SUCCESSFULY);
                 showSetup(false);
                 break;
@@ -113,7 +131,7 @@ export default function Login({ navigation }) {
             <TextInput style={styles.textBox} secureTextEntry={true} onChangeText={onChangePassword} placeholder='Password' />
           </View>
           {showAccountSetUp ? (
-            <View style={{ height: 120, justifyContent: 'space-around', alignItems: 'center', width: '100%' }}>
+            <View style={{ justifyContent: 'space-around', alignItems: 'center', width: '100%' }}>
               <View style={{ width: '100%', flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center' }}>
                 <View style={{ width: '30%', alignItems: 'center' }}>
                   <TextInput style={[styles.textBox, { width: '100%', fontSize: 10, paddingStart: 10, borderBottomWidth: 1, borderColor: 'gray' }]} onChangeText={changeFirstName} value={firstName} placeholder='FirstName' />
@@ -125,6 +143,12 @@ export default function Login({ navigation }) {
                   <TextInput style={[styles.textBox, { width: '100%', fontSize: 10, paddingStart: 10, borderBottomWidth: 1, borderColor: 'gray' }]} onChangeText={changeGroupID} value={groupID} placeholder='Home ID' />
                 </View>
               </View>
+              <TouchableOpacity style={[styles.boxVert, { width: '80%', padding: 20 }]} onPress={selectImage}>
+                <Text>Add profile picture</Text>
+                <View style={{ overflow: 'hidden', width: 60, height: 60, backgroundColor: Colors.primary, borderRadius: 100, alignItems: 'center', justifyContent: 'space-around' }}>
+                  {image && <Image source={{uri: image}} style={{height: '100%', width: '100%'}}/>}
+                </View>
+              </TouchableOpacity>
               <View style={{ width: '50%' }}>
                 <Button
                   title='submit'
@@ -163,7 +187,6 @@ export default function Login({ navigation }) {
                 color={color.textPrimary}
                 onPress={async () => {
                   const result = await signIn(userName, password);
-                  console.log(result);
                   switch (result) {
                     case -1:
                       changeMessageBar(RED, messages.ERROR_SERVER_CONNECTION);
