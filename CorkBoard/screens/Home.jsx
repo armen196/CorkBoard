@@ -76,7 +76,7 @@ export default function HomeScreen() {
         if (item.poster == "No replies yet!") {
             return (
                 <View style={[styles.boxVert, { height: REPLY_BOX_SIZE, borderColor: '#bbb', borderBottomWidth: 1, borderTopWidth: index === 0 ? 1 : 0 }]}>
-                    <View style={{ width: '60%', alignItems: 'center' }}>
+                    <View style={{ width: '80%', alignItems: 'center' }}>
                         <Text style={{ fontWeight: 'bold' }}>{item.poster}</Text>
                         <Text>{item.post}</Text>
                     </View>
@@ -159,7 +159,7 @@ export default function HomeScreen() {
                         <View style={{ width: '100%', justifyContent: 'space-around', alignItems: 'center' }}>
                             <View style={[styles.itemBox, { height: 100, textAlign: 'center' }]}>
                                 <View style={styles.boxVert}>
-                                    <Image source={{ uri: 'http://10.0.0.228:8001/media/images/' + item.poster + '.jpg' }} style={{ width: '20%', aspectRatio: 1, backgroundColor: 'black', borderRadius: 100 }} />
+                                <Image source={{ uri: item.poster === 'No posts to show!' ? 'http://10.0.0.228:8001/media/images/corkboard_mod.jpg' : 'http://10.0.0.228:8001/media/images/' + item.poster + '.jpg' }} style={{ width: '20%', aspectRatio: 1, backgroundColor: 'black', borderRadius: 100 }} />
                                     <View style={{ width: '60%' }}>
                                         <Text style={{ fontWeight: 'bold' }}>{item.poster}</Text>
                                         <Text>{item.post}</Text>
@@ -195,7 +195,7 @@ export default function HomeScreen() {
                     ) : (
                         <View style={[styles.itemBox, { height: 100, textAlign: 'center' }]}>
                             <View style={styles.boxVert}>
-                                <Image source={{ uri: 'http://10.0.0.228:8001/media/images/' + item.poster + '.jpg' }} style={{ width: '20%', aspectRatio: 1, backgroundColor: 'black', borderRadius: 100 }} />
+                                <Image source={{ uri: item.poster === 'No posts to show!' ? 'http://10.0.0.228:8001/media/images/corkboard_mod.jpg' : 'http://10.0.0.228:8001/media/images/' + item.poster + '.jpg' }} style={{ width: '20%', aspectRatio: 1, backgroundColor: 'black', borderRadius: 100 }} />
                                 <View style={{ width: '60%', alignItems: 'center' }}>
                                     <Text style={{ fontWeight: 'bold' }}>{item.poster}</Text>
                                     <Text>{item.post}</Text>
