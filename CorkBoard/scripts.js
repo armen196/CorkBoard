@@ -83,8 +83,8 @@ export function signIn(username, password) {
         });
 }
 
-export function print(varName = "Default", toPrint) {
-    console.log(varName + ": " + toPrint);
+export function print(toPrint) {
+    console.log(toPrint);
 }
 
 export async function getPosts(groupID) {
@@ -311,4 +311,53 @@ export function getImageTag(userName) {
         }
         console.log("Got no image tag");
     });
+}
+
+export async function getChores() {
+    const url = 'http://10.0.0.228:8001/CorkBoard/getChores/';
+    const toSend = {
+        groupID: globalGroupID
+    }
+
+    return await axios.post(url, toSend)
+        .then(response => {
+            const data = response.data;
+            if (data == 531) {
+                return 1;
+            } else {
+                print(data);
+                return data;
+            }
+            
+        }
+        )
+}
+
+/**
+ * 
+ * @param {*} chore Name of chore to add
+ * @param {*} description Optional description for chore
+ * @returns 
+ */
+export async function makeChore(chore, description) {
+    const url = 'http://10.0.0.228:8001/CorkBoard/addChore/';
+    const toSend = {
+        groupID: globalGroupID,
+        chore: chore,
+        description: description,
+        userName: globalUserName
+    }
+    print("Username: " + globalUserName + ", groupID: " + globalGroupID);
+    return await axios.post(url, toSend)
+        .then(response => {
+            const data = response.data;
+            if (data == 531) {
+                return 1;
+            } else {
+                print(data);
+                return data;
+            }
+            
+        }
+        )
 }

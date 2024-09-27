@@ -5,8 +5,6 @@ import color from '../Colors';
 import { changeListName, getList, makeItem, makeList, markItemAsPurchased, print, removeItem, deleteList } from '../scripts';
 import { SwipeListView } from 'react-native-swipe-list-view';
 import MasonryList from 'react-native-masonry-list';
-import Bills from './Bills';
-//let list = [];
 const listAnimValues = [];
 const itemList = [];
 export default function Lists({ navigation }) {
