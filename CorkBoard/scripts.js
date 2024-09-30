@@ -325,7 +325,7 @@ export async function getChores() {
             if (data == 531) {
                 return 1;
             } else {
-                print(data);
+                
                 return data;
             }
             
@@ -354,7 +354,7 @@ export async function makeChore(chore, description) {
             if (data == 531) {
                 return 1;
             } else {
-                print(data);
+                
                 return data;
             }
             
