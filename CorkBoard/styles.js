@@ -79,8 +79,11 @@ export const styles = StyleSheet.create({
     buttonText: {
         fontWeight: '600',
     },
-    navBar: {
-        
+    centerBox: {
+        alignItems: 'center',
+        justifyContent: 'space-around',
+        width: '100%',
+        height: '100%'
 
     }
 });

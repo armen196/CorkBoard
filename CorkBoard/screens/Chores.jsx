@@ -2,7 +2,7 @@ import React, { useRef, useEffect, useState } from 'react';
 import { StyleSheet, Animated, Text, View, TextInput, SafeAreaView, Button, FlatList, ScrollView, useWindowDimensions, TouchableOpacity, ActivityIndicator, RefreshControl, Dimensions, Image } from 'react-native';
 
 import color from '../Colors';
-import { getChores, getList, globalGroupID, makeChore, makeItem, makeList, print } from '../scripts';
+import { getChores, getList, getUsernameFromID, globalGroupID, makeChore, makeItem, makeList, markChoreAsCompleted, print } from '../scripts';
 import { SwipeListView } from 'react-native-swipe-list-view';
 import { styles } from '../styles';
 
@@ -12,8 +12,10 @@ export default function Chores() {
     const [showPostBar, changeShowPostBar] = useState(false);
     const [choreToAdd, changeChoreToAdd] = useState('');
     const [choreDesc, changeChoreDesc] = useState('');
+    const [noChores, changeNoChores] = useState(false)
     const postBarHeight = useRef(new Animated.Value(0)).current;
     const screenWidth = Dimensions.get('window').width;
+    const [showCompleted, changeShowCompleted] = useState(false);
 
     const togglePostBar = () => {
         Animated.timing(postBarHeight, {
@@ -24,9 +26,17 @@ export default function Chores() {
     }
 
     const fetchChores = async () => {
+        chores = [];
+        changeHasData(false);
         const data = await getChores();
-        chores = data;
-        changeHasData(true);
+        if (data == 'No chores') {
+            changeNoChores(true);
+        } else {
+            changeNoChores(false);
+            chores = data;
+            changeHasData(true);
+        }
+
     }
 
     useEffect(() => {
@@ -41,14 +51,39 @@ export default function Chores() {
                 <View style={{ width: (screenWidth / 2) - 20, height: 300, backgroundColor: 'white', borderRadius: 15 }}>
                     <View style={{ width: '100%', height: '20%', alignItems: 'center', justifyContent: 'center' }}>
                         <View style={styles.boxVert}>
-                        <Image source={{ uri: 'http://10.0.0.228:8001/CorkBoard/getImageFromID/' + item.poster_id }} style={{ width: '20%', aspectRatio: 1, backgroundColor: 'black', borderRadius: 100 }} />
+                            <Image source={{ uri: 'http://10.0.0.228:8001/CorkBoard/getImageFromID/' + item.poster_id }} style={{ width: '20%', aspectRatio: 1, backgroundColor: 'black', borderRadius: 100 }} />
                             <Text style={{ fontWeight: '600' }}>{item.chore}</Text>
                         </View>
                     </View>
-                    <ScrollView style={{ width: '100%', padding: 20 }} contentContainerStyle={{flex: 1}}>
+                    <ScrollView style={{ width: '100%', padding: 20 }} >
                         <Text>{item.description}</Text>
                     </ScrollView>
-                    <View style={{height: '20%'}}></View>
+                    <View style={{ height: '20%', width: '100%', alignItems: 'center', justifyContent: 'flex-end', paddingVertical: 10, rowGap: 10 }}>
+                        <View style={[styles.boxVert, { width: '100%' }]}>
+                            <TouchableOpacity style={{ width: 40, borderWidth: 1, height: 40, borderRadius: 8 }} onPress={async () => {
+                                await markChoreAsCompleted(item.id);
+                                fetchChores();
+                            }}>
+                                <View style={styles.centerBox}>
+                                    {item.completed ? (
+                                        <Text style={{ fontSize: 30, color: 'green' }}>{'\u2713'}</Text>
+                                    ) : (
+                                        <></>
+                                    )}
+                                </View>
+                            </TouchableOpacity>
+                            {item.completed ? (<Text>Completed by</Text>) : (<Text>Complete</Text>)}
+
+                        </View>
+                        {item.completed ? (
+                            <View style={styles.boxVert}>
+                                <Image source={{ uri: 'http://10.0.0.228:8001/CorkBoard/getImageFromID/' + item.completer_id }} style={{ width: '20%', aspectRatio: 1, backgroundColor: 'black', borderRadius: 100 }} />
+                                <Text></Text>
+                            </View>
+                            
+                        ) : (<></>)}
+
+                    </View>
                 </View>
             </View>
         );
@@ -73,7 +108,21 @@ export default function Chores() {
                         <Text style={[styles.buttonText, { color: 'green' }]} onPress={async () => {
                             togglePostBar();
                             await makeChore(choreToAdd, choreDesc);
+                            fetchChores();
                         }}>SUBMIT</Text>
+                    </View>
+                    <View style={[styles.boxVert, { width: '60%' }]}>
+                        <TouchableOpacity style={{ width: 40, borderWidth: 1, height: 40, borderRadius: 8 }} onPress={() => { changeShowCompleted(!showCompleted) }}>
+                            <View style={styles.centerBox}>
+                                {showCompleted ? (
+                                    <Text style={{ fontSize: 30, color: 'green' }}>{'\u2713'}</Text>
+                                ) : (
+                                    <></>
+                                )}
+                            </View>
+
+                        </TouchableOpacity>
+                        <Text>Show completed?</Text>
                     </View>
                 </Animated.View>
             </View>
@@ -81,7 +130,7 @@ export default function Chores() {
             {hasData ? (
                 <FlatList
                     style={{ flex: 1 }}
-                    data={chores}
+                    data={showCompleted ? chores : chores.filter(chore => chore.completed === false)}
                     renderItem={choreItem}
                     horizontal={false}
                     numColumns={2}
@@ -89,7 +138,20 @@ export default function Chores() {
                     contentContainerStyle={{ rowGap: 20 }}
                 />
             ) : (
-                <Text>Loading...</Text>
+                <View style={{ padding: 20 }}>
+                    <View style={[styles.centerBox, { height: 200, backgroundColor: 'white', borderRadius: 15 }]}>
+                        {noChores ? (
+                            <View style={{ height: '100%', justifyContent: 'space-evenly' }}>
+                                <Text style={[styles.buttonText, { fontSize: 20 }]}>There are currently no chores!</Text>
+                                <Text>Click the plus button at the top right, and add a title and a description!</Text>
+                            </View>
+
+                        ) : (
+                            <Text>Loading...</Text>
+                        )}
+                    </View>
+                </View>
+
             )}
 
         </View >

@@ -2,7 +2,7 @@ import axios from 'axios';
 import React from 'react';
 import { Alert } from 'react-native';
 import { codes, messages } from './codes';
-import {  } from './globals';
+import { } from './globals';
 //import { groupID, groupIDGlobal, userNameGlobal } from './globals'
 
 export var globalGroupID = '';
@@ -32,7 +32,7 @@ export async function registerUser(userName, password, firstName, lastName, grou
                 'Content-Type': 'multipart/form-data',  // Important to set this header for FormData
             },
         });
-        
+
         const data = response.data;
         if (data.code === 511) {
             console.log('Username taken');
@@ -297,7 +297,7 @@ export async function updateUsers(groupID) {
                 groupMembers = data;
                 return data;
             }
-            
+
         }
         )
 }
@@ -325,10 +325,10 @@ export async function getChores() {
             if (data == 531) {
                 return 1;
             } else {
-                
+
                 return data;
             }
-            
+
         }
         )
 }
@@ -354,10 +354,37 @@ export async function makeChore(chore, description) {
             if (data == 531) {
                 return 1;
             } else {
-                
+
                 return data;
             }
-            
+
         }
         )
 }
+
+export async function markChoreAsCompleted(id) {
+    const url = `http://10.0.0.228:8001/CorkBoard/markChoreAsCompleted/`;
+    const toSend = {
+        choreID: id,
+        userName: globalUserName
+    }
+    return await axios.post(url, toSend)
+        .then(response => {
+            const data = response.data;
+            
+
+        }
+        )
+};
+
+
+export async function getUsernameFromID(id) {
+    const url = `http://10.0.0.228:8001/CorkBoard/getUsernameFromID/${id}`;
+    
+    return await fetch(url, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+};
